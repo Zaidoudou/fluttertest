@@ -23,8 +23,8 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-    const { username, password } = req.body;
-    if (username && password) {
+    const { username, password, confpassword } = req.body;
+    if ([username, password, confpassword].every(Boolean) && password === confpassword) {
         const cipher = crypto.createCipher('aes192', 'awWjqAZnd6g3XgtFouFXUj9g5d2xdSp');
         let encrypted = cipher.update(password, 'utf8', 'hex');
         encrypted += cipher.final('hex');
