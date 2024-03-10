@@ -38,14 +38,9 @@ app.post('/register', (req, res) => {
     }
 });
 
-app.delete('/user/:user', (req, res) => {
-    const { user: username } = req.params;
-    if (user && user.username === username) {
+app.delete('/user', (req, res) => {
         user = {};
         res.status(200).send('User deleted');
-    } else {
-        res.status(404).send('User not found');
-    }
 });
 
 app.get('/user', (req, res) => {

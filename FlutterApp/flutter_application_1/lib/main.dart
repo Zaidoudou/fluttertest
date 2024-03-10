@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
+import 'package:flutter_application_1/screen/home.dart';
 
 const String serverUrl = 'http://192.168.1.32:8080';
 
@@ -10,7 +10,15 @@ void main() {
   runApp(const MyApp());
 }
 
-Future<int> UserCredentials(String action, String username, String password) async {
+Future<int> userCredentials(String action, String username, String password) async {
+  switch (action) {
+    case 'user':
+    final response = await http.delete(
+      Uri.parse('$serverUrl/$action'),
+    ).timeout(const Duration(seconds: 10));
+    return response.statusCode;
+
+    default:
     final response = await http.post(
       Uri.parse('$serverUrl/$action'),
       headers: {
@@ -23,6 +31,7 @@ Future<int> UserCredentials(String action, String username, String password) asy
     ).timeout(const Duration(seconds: 10));
     return response.statusCode; //
     }
+}
 
 
 class MyApp extends StatelessWidget {
@@ -42,7 +51,7 @@ class MyApp extends StatelessWidget {
 }
 
 class FrontPage extends StatelessWidget {
-  const FrontPage({super.key});
+  const FrontPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +61,6 @@ class FrontPage extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
       ),
       body: Center(
-
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -61,7 +69,7 @@ class FrontPage extends StatelessWidget {
                 // Navigate to login screen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
               child: const Text('Login'),
@@ -77,6 +85,52 @@ class FrontPage extends StatelessWidget {
               },
               child: const Text('Register'),
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                int status = await userCredentials('user', 'null', 'null');
+                switch(status) {
+                  case 200:
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Success'),
+                          content: const Text('We are sad to see you go.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                    break;
+                  default:
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Error'),
+                          content: const Text('Uknown error : Server Unreachable'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                }
+              },
+              child: const Text('Delete Account'),
+            ),
           ],
         ),
       ),
@@ -84,18 +138,103 @@ class FrontPage extends StatelessWidget {
   }
 }
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
 
+class LoginPage extends StatelessWidget {
+  LoginPage({super.key});
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.blue,
       ),
-      body: const Center(
-        child: Text('Login Page'),
+      body: Center(
+        child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextField(
+            controller: usernameController,
+            decoration: InputDecoration(
+              labelText: 'Username',
+            ),
+          ),
+          TextField(
+            controller: passwordController,
+            decoration: InputDecoration(
+              labelText: 'Password',
+            ),
+            obscureText: true,
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Login user
+              final username = usernameController.text;
+              final password = passwordController.text;
+              int status = await userCredentials('login',username, password);
+              if (status == 200) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+              } else if (status == 408) {
+                showDialog(
+                  context: context, 
+                  builder:(BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Error'),
+                      content: const Text('Request Timed Out'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              } else if (status == 400){
+                showDialog(
+                  context: context,
+                   builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Error'),
+                      content: const Text('Invalid Username or Password'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    );
+              });
+              } else {
+                showDialog(
+                  context: context
+                  , builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Error'),
+                      content: const Text('Failed to Login'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                  );
+              }
+            },
+            child: const Text('Login'),
+          ),
+        ],
+        )
       ),
     );
   }
@@ -145,7 +284,7 @@ class RegisterPage extends StatelessWidget {
                 final password = passwordController.text;
                 final confirmPassword = confirmPasswordController.text;
                 if (password == confirmPassword) {
-                  int status = await UserCredentials('register',username, password);
+                  int status = await userCredentials('register',username, password);
                   if (status == 200) {
                     showDialog(
                       context: context, 
