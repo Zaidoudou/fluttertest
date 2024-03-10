@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
 }
 
 class FrontPage extends StatelessWidget {
-  const FrontPage({Key? key}) : super(key: key);
+  const FrontPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -157,13 +157,13 @@ class LoginPage extends StatelessWidget {
         children: [
           TextField(
             controller: usernameController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Username',
             ),
           ),
           TextField(
             controller: passwordController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Password',
             ),
             obscureText: true,
@@ -259,20 +259,20 @@ class RegisterPage extends StatelessWidget {
           children: [
             TextField(
               controller: usernameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Username',
               ),
             ),
             TextField(
               controller: passwordController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Password',
               ),
               obscureText: true,
             ),
             TextField(
               controller: confirmPasswordController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Confirm Password',
               ),
               obscureText: true,
