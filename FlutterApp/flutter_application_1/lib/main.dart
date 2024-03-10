@@ -1,20 +1,24 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:async';
 import 'package:flutter_application_1/screen/home.dart';
+import 'dart:convert';
 
 const String serverUrl = 'http://192.168.1.32:8080';
+const String authToken = 'aaTHi9gvqjEZQ72rocA4kX9TJJwkzgQkX5SL3aWxot2yoAKAZJ';
 
 void main() {
   runApp(const MyApp());
 }
 
+//api interaction are not recurrent so we can afford to use http.get and http.post instead of using a client
 Future<int> userCredentials(String action, String username, String password) async {
   switch (action) {
     case 'user':
     final response = await http.delete(
       Uri.parse('$serverUrl/$action'),
+      headers: {
+        'authorization': authToken,
+      },
     ).timeout(const Duration(seconds: 10));
     return response.statusCode;
 
@@ -23,6 +27,7 @@ Future<int> userCredentials(String action, String username, String password) asy
       Uri.parse('$serverUrl/$action'),
       headers: {
         'Content-Type': 'application/json',
+        'authorization': authToken,
       },
       body: jsonEncode({
         'username': username,
@@ -32,7 +37,6 @@ Future<int> userCredentials(String action, String username, String password) asy
     return response.statusCode; //
     }
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -138,7 +142,6 @@ class FrontPage extends StatelessWidget {
   }
 }
 
-
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
   final usernameController = TextEditingController();
@@ -168,6 +171,7 @@ class LoginPage extends StatelessWidget {
             ),
             obscureText: true,
           ),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () async {
               // Login user
@@ -194,7 +198,7 @@ class LoginPage extends StatelessWidget {
                     );
                   },
                 );
-              } else if (status == 400){
+              } else if (status == 401){
                 showDialog(
                   context: context,
                    builder: (BuildContext context) {

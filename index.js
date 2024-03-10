@@ -3,7 +3,20 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 8080;
 
+// here the token is stored in clear because if we encrypted it would only be displacing the problem, to properly secure it off we would need a data vault.
+const authToken = 'aaTHi9gvqjEZQ72rocA4kX9TJJwkzgQkX5SL3aWxot2yoAKAZJ';
+
+const authMiddleware = (req, res, next) => {
+    const token = req.headers.authorization;
+    if (token === authToken) {
+        next();
+    } else {
+        res.status(401).send('Unauthorized');
+    }
+};
+
 app.use(express.json());
+app.use(authMiddleware);
 
 app.listen(
     PORT,

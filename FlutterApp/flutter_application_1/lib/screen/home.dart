@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   void disconnect(BuildContext context) {
     Navigator.popUntil(context, (route) => route.isFirst);
   }
@@ -9,9 +11,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: const Text('Home'),
       ),
-      body: Center(
+      body: const Center(
         child: Text(
           'Welcome to the Home Page!',
           style: TextStyle(fontSize: 24),
