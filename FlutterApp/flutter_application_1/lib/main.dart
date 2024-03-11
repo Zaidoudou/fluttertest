@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/screen/home.dart';
 import 'dart:convert';
 
-const String serverUrl = 'http://192.168.1.32:8080';
+const String serverUrl = 'http://localhost:8080';
 const String authToken = 'aaTHi9gvqjEZQ72rocA4kX9TJJwkzgQkX5SL3aWxot2yoAKAZJ';
 
 void main() {
@@ -36,6 +36,36 @@ Future<int> userCredentials(String action, String username, String password) asy
     ).timeout(const Duration(seconds: 10));
     return response.statusCode; //
     }
+}
+
+//We're using showDialog a lot so I used a function to cut down on the code.
+void _showDialog(String pop, BuildContext context, String title, String content) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () {
+              switch(pop) {
+                case 'pop':
+                  Navigator.pop(context);
+                  break;
+                case 'popUntil':
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                  break;
+                default:
+                  Navigator.pop(context);
+              }
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -95,25 +125,10 @@ class FrontPage extends StatelessWidget {
                 int status = await userCredentials('user', 'null', 'null');
                 switch(status) {
                   case 200:
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Success'),
-                          content: const Text('We are sad to see you go.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    _showDialog('pop', context, 'Success', 'User Deleted');
                     break;
                   default:
+                    _showDialog('pop', context, 'Error', 'Failed to Delete User');
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -181,58 +196,11 @@ class LoginPage extends StatelessWidget {
               if (status == 200) {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
               } else if (status == 408) {
-                showDialog(
-                  context: context, 
-                  builder:(BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Error'),
-                      content: const Text('Request Timed Out'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    );
-                  },
-                );
+                _showDialog('pop', context,'Error', 'Request Timed Out');
               } else if (status == 401){
-                showDialog(
-                  context: context,
-                   builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Error'),
-                      content: const Text('Invalid Username or Password'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    );
-              });
+                _showDialog('pop', context,'Error', 'Invalid Username or Password');
               } else {
-                showDialog(
-                  context: context
-                  , builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Error'),
-                      content: const Text('Failed to Login'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    );
-                  },
-                  );
+                _showDialog('pop', context,'Error', 'Failed to Login');
               }
             },
             child: const Text('Login'),
@@ -290,95 +258,18 @@ class RegisterPage extends StatelessWidget {
                 if (password == confirmPassword) {
                   int status = await userCredentials('register',username, password);
                   if (status == 200) {
-                    showDialog(
-                      context: context, 
-                      builder:(BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Success'),
-                          content: const Text('Successfully Registered'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.popUntil(context, (route) => route.isFirst);
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                      );
+                    _showDialog('popUntil', context, 'Success', 'User Registered');
                   } else if (status == 408) {
-                    showDialog(
-                      context: context, 
-                      builder:(BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Error'),
-                          content: const Text('Request Timed Out'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    _showDialog('pop', context, 'Error', 'Request Timed Out');
                   } else if (status == 400){
-                    showDialog(
-                      context: context,
-                       builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Error'),
-                          content: const Text('Invalid Username or Password'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                  });
+                    _showDialog('pop', context, 'Error', 'Invalid Username or Password');
                   } else {
-                    showDialog(
-                      context: context
-                      , builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Error'),
-                          content: const Text('Failed to Register'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                      );
+                    _showDialog('pop', context, 'Error', 'Failed to Register');
                   }
 
                 } else {
-                  showDialog(
-                    context: context,
-                     builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Error'),
-                        content: const Text('Passwords do not match'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      );
-                });}
+                  _showDialog('pop', context, 'Error', 'Password Mismatch');
+                  }
               },
               child: const Text('Register'),
             ),

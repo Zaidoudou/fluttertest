@@ -1,3 +1,4 @@
 {
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    "cmake.sourceDirectory": "C:/dev/VSCODE/fluttertest/FlutterApp/flutter_application_1/linux"
 }
