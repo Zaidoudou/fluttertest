@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/screen/home.dart';
@@ -194,7 +196,7 @@ class LoginPage extends StatelessWidget {
               final password = passwordController.text;
               int status = await userCredentials('login',username, password);
               if (status == 200) {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
               } else if (status == 408) {
                 _showDialog('pop', context,'Error', 'Request Timed Out');
               } else if (status == 401){
