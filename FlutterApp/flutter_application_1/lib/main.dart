@@ -1,14 +1,21 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/screen/home.dart';
 import 'dart:convert';
+import 'dart:io';
 
-const String serverUrl = 'http://localhost:8080';
-const String authToken = 'aaTHi9gvqjEZQ72rocA4kX9TJJwkzgQkX5SL3aWxot2yoAKAZJ';
+String serverUrl ='http://undefined:undefined';
+String authToken = 'undefined';
 
+void dataInitialisation(){
+  final File file = File('lib/config/dataApp.json');
+  final String data = file.readAsStringSync();
+  final Map<String, dynamic> dataApp = jsonDecode(data) as Map<String, dynamic>;
+  serverUrl = 'http://${dataApp["serverHost"]}:${dataApp["serverPort"]}';
+  authToken = dataApp["authToken"] as String;
+}
 void main() {
+  dataInitialisation();
   runApp(const MyApp());
 }
 
