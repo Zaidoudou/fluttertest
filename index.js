@@ -1,10 +1,13 @@
 const express = require('express');
 const crypto = require('crypto');
+const fs = require('fs');
 const app = express();
-const PORT = 8080;
 
-// here the token is stored in clear because if we encrypted it would only be displacing the problem, to properly secure it off we would need a data vault.
-const authToken = 'aaTHi9gvqjEZQ72rocA4kX9TJJwkzgQkX5SL3aWxot2yoAKAZJ';
+const config = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+const authToken = config.authToken;
+const serverHost = config.serverHost;
+const serverPort = config.serverPort;
+
 
 const authMiddleware = (req, res, next) => {
     const token = req.headers.authorization;
@@ -19,8 +22,8 @@ app.use(express.json());
 app.use(authMiddleware);
 
 app.listen(
-    PORT,
-    () => console.log(`Server is running on http://localhost:${PORT}`)
+    serverPort,
+    () => console.log(`Server is running on http://${serverHost}:${serverPort}`)
 );
 
 app.post('/login', (req, res) => {
